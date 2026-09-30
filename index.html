@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Petrol Station Manager</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config={theme:{screens:{sm:'601px',md:'901px',xl:'1101px'},extend:{
+colors:{page:'var(--bg)',surf:'var(--sf)',ink:'var(--ink)',mut:'var(--mut)',line:'var(--ln)',side:'var(--side)',ac:'var(--ac)',gr:'var(--gr)',rd:'var(--rd)',bl:'var(--bl)'},
+fontFamily:{sans:['Inter','system-ui','sans-serif'],display:['Bricolage Grotesque','Inter','sans-serif']}}}}
+</script>
+<style type="text/tailwindcss">
+@layer base {
+  :root{--bg:#eef1ec;--sf:#fff;--ink:#14231c;--mut:#61716a;--ln:#dde3dc;--side:#0f2a20;--ac:#f2b705;--gr:#1f8a5b;--rd:#c8402f;--bl:#2467b5}
+  @media (prefers-color-scheme:dark){:root{--bg:#0d1612;--sf:#15211b;--ink:#e6eee9;--mut:#8ea49a;--ln:#26362e;--side:#08130e}}
+  html{@apply pt-[env(safe-area-inset-top,0px)] pb-[env(safe-area-inset-bottom,0px)] scroll-pt-[env(safe-area-inset-top,0px)]}
+  h1,h2,h3{@apply m-0 font-display font-bold}
+  h1{@apply text-[19px] md:text-[30px]}
+  h2{@apply text-[21px]}
+  h3{@apply text-[16.5px]}
+  p{@apply my-3.5}
+}
+@layer components {
+  /* sidebar */
+  .brand{@apply flex items-center gap-3 px-2.5 pt-1 pb-[22px] text-white font-display font-bold text-[19px]}
+  .brand i{@apply grid place-items-center w-10 h-10 rounded-lg bg-ac text-[#0f2a20] not-italic text-[22px]}
+  aside button{@apply flex items-center gap-3.5 cursor-pointer rounded-lg px-3 py-2 text-[15px] font-medium text-left hover:bg-white/[.08] focus-visible:outline focus-visible:outline-2 focus-visible:outline-bl}
+  aside button span{@apply grid place-items-center w-11 h-11 shrink-0 rounded-xl bg-white/[.08] text-2xl}
+  aside button.on{@apply bg-ac text-[#0f2a20] font-semibold shadow-[0_6px_16px_-8px_#f2b705]}
+  aside button.on span{@apply bg-[#0f2a2026]}
+  /* top navigation (tablet and phone) */
+  #tnav{@apply md:hidden grid grid-cols-6 gap-0.5 sticky top-0 z-[5] -mx-2 sm:-mx-3.5 mb-2.5 px-1 py-[5px] sm:px-2 sm:py-1.5 bg-side shadow-[0_4px_14px_-6px_#0006]}
+  #tnav button{@apply flex flex-col items-center gap-0.5 px-0.5 py-1.5 rounded-[10px] text-[#cfe0d6] text-[10px] sm:text-xs text-center cursor-pointer}
+  #tnav button span{@apply text-[21px] sm:text-2xl leading-[1.1]}
+  #tnav button.on{@apply bg-ac text-[#0f2a20] font-semibold}
+  .ml{@apply grid gap-1.5}
+  .ml button{@apply flex items-center gap-3 w-full px-2.5 py-2 rounded-xl border border-line cursor-pointer text-left}
+  .ml button span{@apply grid place-items-center w-10 h-10 text-[22px] rounded-[10px] bg-page}
+  .ml button b{@apply ml-auto text-mut text-xl}
+  .ml button.on{@apply bg-ac text-[#0f2a20] font-semibold border-ac}
+  /* page header */
+  .top{@apply flex flex-wrap items-center justify-between gap-2.5 mb-[18px]}
+  main>.top{@apply rounded-xl md:rounded-2xl text-white px-3.5 py-2.5 md:px-7 md:py-[22px] mb-2.5 md:mb-[22px] bg-gradient-to-r from-side to-[#1b6a4a]}
+  main>.top h1{@apply text-white}
+  main>.top .sub{@apply text-[#bcd6c7] text-xs md:text-[15px]}
+  main>.top .btn.ghost{@apply text-white border-white/40}
+  main>.top .btn.ac{@apply bg-ac text-[#0f2a20]}
+  main>.top .btn:not(.ac):not(.ghost){@apply bg-white/[.15]}
+  .sub{@apply text-mut}
+  /* cards and stats */
+  .card{@apply bg-surf border border-line rounded-2xl p-3 md:p-5 mb-4 overflow-x-auto shadow-[0_1px_2px_#0000000d,0_8px_20px_-12px_#00000030] print:break-inside-avoid print:border-[#999]}
+  .sgrid{@apply grid grid-cols-2 gap-3 sm:gap-3.5 sm:grid-cols-[repeat(auto-fit,minmax(200px,1fr))] md:gap-[18px] md:grid-cols-[repeat(auto-fit,minmax(230px,1fr))] mb-4 md:mb-5}
+  .sgrid .card{@apply m-0 transition-transform hover:-translate-y-0.5}
+  .sgrid .stock-value-stat{@apply col-span-2}
+  .card.stat{@apply max-md:p-2.5}
+  .stat b{@apply block mt-0.5 font-display font-bold text-[17px] sm:text-2xl md:text-[30px]}
+  .stat span{@apply text-mut text-xs md:text-[15px]}
+  .stat.a{@apply border-l-[5px] border-l-ac}
+  .stat.b{@apply border-l-[5px] border-l-gr}
+  .stat.c{@apply border-l-[5px] border-l-bl}
+  .stat.d{@apply border-l-[5px] border-l-rd}
+  .two{@apply grid grid-cols-1 gap-4 xl:grid-cols-[1.7fr_1fr] xl:gap-5}
+  .two.one{@apply xl:grid-cols-1}
+  .alert{@apply flex items-center gap-2.5 bg-[#c8402f1f] border border-rd text-rd rounded-xl px-3.5 py-3 mb-3.5 cursor-pointer font-semibold}
+  .tot{@apply font-display font-bold text-xl}
+  .fl{@apply grid gap-3.5 mb-1.5}
+  .fl div{@apply grid gap-1}
+  .bar{@apply h-2.5 bg-line rounded-full overflow-hidden}
+  .bar i{@apply block h-full bg-gr}
+  .bar.low i{@apply bg-rd}
+  .chart{@apply flex items-end gap-3 h-[170px] md:h-[220px]}
+  .chart div{@apply flex-1 flex flex-col justify-end items-center h-full gap-1 text-[11px] text-mut}
+  .chart i{@apply w-full max-w-[54px] bg-gr rounded-t-md min-h-[2px] not-italic}
+  .chart.dense{@apply gap-[5px]}
+  .chart.dense div{@apply text-[10px]}
+  .chart i.cur{@apply bg-ac}
+  .seg{@apply flex gap-1 bg-page p-[3px] rounded-[10px] overflow-x-auto max-w-full}
+  .seg button{@apply cursor-pointer px-[11px] py-1.5 rounded-lg text-[12.5px] font-semibold text-mut whitespace-nowrap}
+  .seg button.on{@apply bg-surf text-ink shadow-[0_1px_3px_#0002]}
+  /* tables */
+  table{@apply w-full border-separate border-spacing-0 tabular-nums}
+  th{@apply bg-page text-mut font-medium text-left text-[11.5px] uppercase tracking-wider px-2.5 py-3 first:rounded-l-lg last:rounded-r-lg}
+  td{@apply px-2.5 py-3 md:px-3 md:py-[13px] border-b border-line}
+  tr:last-child td{@apply border-b-0}
+  td.r,th.r{@apply text-right}
+  tr:nth-child(even) td{@apply bg-[color:color-mix(in_srgb,var(--ink)_3%,transparent)]}
+  tbody tr:hover td{@apply bg-[#f2b70510]}
+  .clk{@apply cursor-pointer}
+  .ts{@apply w-full mb-2.5}
+  /* phone: each table row becomes a card */
+  table tr:first-child{@apply max-sm:hidden}
+  tr{@apply max-sm:block max-sm:bg-surf max-sm:border max-sm:border-line max-sm:border-l-4 max-sm:border-l-ac max-sm:rounded-[10px] max-sm:px-2.5 max-sm:py-1.5 max-sm:mb-2 max-sm:shadow-[0_1px_3px_#0000000f]}
+  td{@apply max-sm:flex max-sm:justify-between max-sm:gap-3 max-sm:py-1.5 max-sm:!border-0 max-sm:!text-right max-sm:!bg-transparent max-sm:before:content-[attr(data-label)] max-sm:before:text-mut max-sm:before:text-left max-sm:before:shrink-0}
+  td:empty{@apply max-sm:hidden}
+  td:first-child{@apply max-sm:font-semibold max-sm:text-[14.5px] max-sm:pb-1.5 max-sm:!border-b max-sm:!border-dashed max-sm:!border-line}
+  /* forms and buttons */
+  form{@apply grid items-end gap-3 grid-cols-1 sm:grid-cols-[repeat(auto-fit,minmax(170px,1fr))]}
+  label{@apply grid gap-1 text-mut text-[12.5px]}
+  input,select{@apply w-full rounded-lg border border-line bg-page text-ink px-2.5 py-[9px] text-base sm:text-[15px] max-md:min-h-[44px] focus-visible:outline focus-visible:outline-2 focus-visible:outline-bl focus-visible:outline-offset-2}
+  .btn{@apply cursor-pointer rounded-lg px-4 py-2.5 bg-side text-white font-semibold text-sm max-md:min-h-[44px] focus-visible:outline focus-visible:outline-2 focus-visible:outline-bl focus-visible:outline-offset-2}
+  .btn.ac{@apply bg-ac text-[#0f2a20]}
+  .btn.ghost{@apply bg-transparent text-ink border border-line}
+  .x{@apply cursor-pointer bg-transparent text-rd border border-rd rounded-lg px-2.5 py-1 text-[13px]}
+  .acts{@apply flex flex-wrap gap-2 max-md:w-full}
+  .acts .btn{@apply max-md:flex-[1_1_130px] max-md:px-2.5 max-md:py-[9px] max-md:text-[13px]}
+  .tag{@apply px-[9px] py-0.5 rounded-full text-xs font-semibold}
+  .g{@apply bg-[#1f8a5b22] text-gr}
+  .o{@apply bg-[#c8402f22] text-rd}
+  .y{@apply bg-[#f2b70533] text-[#9a7300]}
+  .pls{@apply grid gap-2 bg-page p-3 rounded-xl}
+  .pl{@apply grid items-center gap-2.5 grid-cols-2 sm:grid-cols-[110px_1fr_1fr_1fr]}
+  .pl.ph2{@apply text-mut text-xs max-sm:hidden}
+  .pl b{@apply max-sm:col-span-full}
+  .pl .amt{@apply font-semibold sm:text-right max-sm:col-span-full}
+  /* popups, profile, toast */
+  .modal{@apply fixed inset-0 z-[9] grid place-items-center bg-black/[.67] p-4 max-sm:items-end max-sm:justify-items-center max-sm:p-0 print:!hidden}
+  .modal .card{@apply m-0 w-full max-w-[720px] md:max-w-[820px] max-h-[90vh] overflow-auto max-sm:max-h-[92vh] max-sm:rounded-b-none max-sm:rounded-t-2xl}
+  .modal .card .card:not(.stat){@apply mb-4 shadow-none}
+  .modal .sgrid{@apply my-3.5}
+  .modal .rs h3{@apply mt-1.5 mb-2.5}
+  .modal .rs>p{@apply mt-2 mb-3.5}
+  .modal .card>.top{@apply mb-3.5}
+  .pf{@apply !max-w-[840px] md:!max-w-[980px]}
+  .pf h3{@apply mt-4 mb-2}
+  .phd{@apply flex flex-wrap sm:flex-nowrap items-center gap-3.5 p-[18px] rounded-[14px] text-white mb-3.5 bg-gradient-to-br from-side to-gr}
+  .phd .cl{@apply ml-auto text-white border-white/40}
+  .av{@apply w-14 h-14 shrink-0 rounded-full bg-ac text-[#0f2a20] grid place-items-center font-display font-bold text-[26px]}
+  .fhead{@apply flex items-center gap-3.5 p-4 rounded-xl text-white mb-4 bg-gradient-to-br from-side to-gr}
+  .fhead i{@apply grid place-items-center w-[52px] h-[52px] rounded-xl bg-white/[.13] not-italic text-[28px]}
+  .toast{@apply fixed bottom-5 right-5 z-10 bg-side text-white px-[18px] py-[11px] rounded-[10px] print:hidden max-sm:left-4 max-sm:right-4 max-sm:text-center}
+  .ph{@apply hidden}
+}
+</style>
+</head>
+<body class="flex min-h-screen bg-page bg-[radial-gradient(1100px_480px_at_85%_-8%,#f2b70522,transparent)] text-ink text-sm md:text-[15px]">
+<aside id="nav" class="hidden md:flex flex-col sticky top-0 h-screen w-[272px] shrink-0 gap-1 px-3.5 py-[22px] text-[#cfe0d6] bg-gradient-to-b from-side to-[#0a1d15] print:!hidden"></aside>
+<main id="main" class="flex-1 min-w-0 max-w-[1800px] px-2 pt-2 pb-6 sm:px-3.5 sm:pt-3.5 md:px-10 md:pt-7 md:pb-11 print:!hidden"></main>
+<div id="modal" class="print:!hidden"></div>
+<div id="pa" class="hidden print:!block p-6"></div>
+<script src="js/app.js"></script>
+</body>
+</html>
