@@ -1284,7 +1284,7 @@ function chartCard() {
   }
   const mx = Math.max(...d.map(x => x[1]), 1),
     T = d.reduce((a, x) => a + x[1], 0);
-  return `<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px"><h3>Sales</h3><div class="seg">${[['7','7 Days'],['m','Monthly'],['y','Yearly']].map(a=>`<button class="${cv==a[0]?'on':''}" onclick="setCv('${a[0]}')">${
+  return `<div class="card"><div class="chart-head"><h3>Sales</h3><div class="seg">${[['7','7 Days'],['m','Monthly'],['y','Yearly']].map(a=>`<button class="${cv==a[0]?'on':''}" onclick="setCv('${a[0]}')">${
     a[1]
   }
   </button>`).join('')}</div></div><p class="sub">${sub} · Total ${Rs(T)}</p><div class="chart ${d.length>8?'dense':''}">${d.map((x,i)=>`<div><span>${
